@@ -9,7 +9,7 @@ $header
 
 `timescale 1ns/1ns
 
-#include "CDEC.def.v"
+#include "cdec.def.v"
 #include "RAM.v"
 
 testmodule CDEC_TEST;
