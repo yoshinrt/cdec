@@ -1,5 +1,5 @@
 %.v: %.def.v
-	vpp.pl $<
+	vpp/vpp.pl $<
 
 %.obj: %.asm
 	./cdecas.pl -s $<
