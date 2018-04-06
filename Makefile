@@ -1,16 +1,14 @@
 %.v: %.def.v
 	vpp.pl $<
 
-storm_test.v: storm.def.v storm.h
-
 %.obj: %.asm
 	./cdecas.pl -s $<
 	ln -sf $@ ram.dat
 
 cdec_test.v: cdec.def.v
 
-%.sim: %.obj cdec_test.v
-	cver $<
+%.sim: cdec_test.v %.obj
+	cver $< RAM.v
 
 clean:
-	rm -f storm_test.list storm_test.v verilog.log
+	rm -f cdec_test.v *.obj ram.dat *.log

@@ -34,18 +34,18 @@ enum tALUCmd {
 
 /*** ALU ********************************************************************/
 
-module ALU;
-
-// I/O port
-
-input	tALUCmd	iALUCmd;		// ALU operation command
-
-output	[7:0]	oDBus0;			// DBus0 ( ALU output )
-input	[7:0]	iDBus1;			// DBus1 ( ALU operand1 )
-input	[7:0]	iDBus2;			// DBus2 ( ALU operand2 )
-input			iCarry;			// CY in
-
-output	[2:0]	oFlags;			// FLAGS out ( SZC )
+module ALU(
+	// I/O port
+	
+	input	tALUCmd	iALUCmd,		// ALU operation command
+	
+	output	[7:0]	oDBus0,			// DBus0 ( ALU output )
+	input	[7:0]	iDBus1,			// DBus1 ( ALU operand1 )
+	input	[7:0]	iDBus2,			// DBus2 ( ALU operand2 )
+	input			iCarry,			// CY in
+	
+	output	[2:0]	oFlags			// FLAGS out ( SZC )
+);
 
 // wire / reg
 
@@ -110,15 +110,15 @@ wire			FlagS,
 	assign oFlags = FLAGS;
 endmodule
 
-module FlagsRegister;
-
-input			Clk;			// clock
-input			Reset;			// reset
-
-input			iWriteEnb;		// Flags reg WE
-input	[2:0]	iFlags;			// FLAGS in ( SZC )
-
-outreg	[2:0]	oFlagsReg;		// FLAGS reg out
+module FlagsRegister(
+	input			Clk,			// clock
+	input			Reset,			// reset
+	
+	input			iWriteEnb,		// Flags reg WE
+	input	[2:0]	iFlags,			// FLAGS in ( SZC )
+	
+	outreg	[2:0]	oFlagsReg		// FLAGS reg out
+);
 
 	Register begin
 		if( Reset )				oFlagsReg <= 3'd0;
@@ -128,26 +128,26 @@ endmodule
 
 /*** generic register file ( PC, A, B, C ) **********************************/
 
-module RegFile;
-
-// I/O port
-
-input			Clk;			// clock
-input			Reset;			// reset
-
-input			iWriteEnb;		// register Write Enable
-input	[1:0]	iDBusSel0;		// write register
-input	[1:0]	iDBusSel1;		// read register DBus1
-input	[1:0]	iDBusSel2;		// read register DBus2
-
-input	[7:0]	iDBus0;			// DBus0 ( ALU output )
-outreg	[7:0]	oDBus1;			// DBus1 ( ALU operand1 )
-outreg	[7:0]	oDBus2;			// DBus2 ( ALU operand2 )
-
-outreg	[7:0]	oRegPC,			// generic registers
-				oRegA,
-				oRegB,
-				oRegC;
+module RegFile(
+	// I/O port
+	
+	input			Clk,			// clock
+	input			Reset,			// reset
+	
+	input			iWriteEnb,		// register Write Enable
+	input	[1:0]	iDBusSel0,		// write register
+	input	[1:0]	iDBusSel1,		// read register DBus1
+	input	[1:0]	iDBusSel2,		// read register DBus2
+	
+	input	[7:0]	iDBus0,			// DBus0 ( ALU output )
+	outreg	[7:0]	oDBus1,			// DBus1 ( ALU operand1 )
+	outreg	[7:0]	oDBus2,			// DBus2 ( ALU operand2 )
+	
+	outreg	[7:0]	oRegPC,			// generic registers
+	outreg	[7:0]	oRegA,
+	outreg	[7:0]	oRegB,
+	outreg	[7:0]	oRegC
+);
 	
 	Register begin
 		if( Reset ) begin
@@ -213,25 +213,25 @@ enum	tState {
 	S_INC_PC2
 };
 
-module Sequencer;
-
-input			Clk;			// clock
-input			Reset;			// reset
-
-input	[7:0]	iIR;			// IR in
-input	[2:0]	iFlagsReg;		// FLAGS reg out
-
-outreg	tALUCmd	oALUCmd;		// ALU operation command
-outreg	[1:0]	oDBusSel0;		// write register
-outreg	[1:0]	oDBusSel1;		// read register DBus1
-outreg	[1:0]	oDBusSel2;		// read register DBus2
-
-outreg			oWE_Regs;		// register file WE
-outreg			oWE_RegIR;		// IR WE
-outreg			oWE_RegMAR;		// MAR WE
-outreg			oRE_MAU;		// MAU RE
-outreg			oWE_MAU;		// MAU WE
-outreg			oWE_Flags;		// Flags reg WE
+module Sequencer(
+	input			Clk,			// clock
+	input			Reset,			// reset
+	
+	input	[7:0]	iIR,			// IR in
+	input	[2:0]	iFlagsReg,		// FLAGS reg out
+	
+	outreg	tALUCmd	oALUCmd,		// ALU operation command
+	outreg	[1:0]	oDBusSel0,		// write register
+	outreg	[1:0]	oDBusSel1,		// read register DBus1
+	outreg	[1:0]	oDBusSel2,		// read register DBus2
+	
+	outreg			oWE_Regs,		// register file WE
+	outreg			oWE_RegIR,		// IR WE
+	outreg			oWE_RegMAR,		// MAR WE
+	outreg			oRE_MAU,		// MAU RE
+	outreg			oWE_MAU,		// MAU WE
+	outreg			oWE_Flags		// Flags reg WE
+);
 
 // wire / reg
 
@@ -306,7 +306,7 @@ reg				bJccTrue;
 					
 					3'b111: NextState = bJccTrue ? S_LD_MEM : S_INC_PC2; // jcc
 					
-					default:NextState = tState_W'bx;
+					default:NextState = tState_w'bx;
 				endcase
 			end
 			
@@ -541,7 +541,7 @@ reg				bJccTrue;
 				NextState	= S_MOV_MAR_PC;
 			
 			default: begin
-				oALUCmd		= tALUCmd_W'bx;
+				oALUCmd		= tALUCmd_w'bx;
 				oDBusSel0	= 2'bx;
 				oDBusSel1	= 2'bx;
 				oDBusSel2	= 2'bx;
@@ -574,14 +574,14 @@ endmodule
 
 /*** generic 8bit register **************************************************/
 
-module Register8;
-
-input			Clk;			// clock
-input			Reset;			// reset
-
-input			iWriteEnb;		// write enable
-input	[7:0]	iData;			// DBus0 ( ALU output )
-outreg	[7:0]	oData;			// IR out
+module Register8(
+	input			Clk,			// clock
+	input			Reset,			// reset
+	
+	input			iWriteEnb,		// write enable
+	input	[7:0]	iData,			// DBus0 ( ALU output )
+	outreg	[7:0]	oData			// IR out
+);
 
 	Register begin
 		if( Reset )				oData <= 8'd0;
@@ -591,18 +591,19 @@ endmodule
 
 /*** CDEC *******************************************************************/
 
-module CDEC;
-
-input			Clk;			// clock
-input			Reset;			// reset
-input			iClkMst;		// master input clk ( 24MHz )
-
-output			oClkDiv;		// output divided clk
-
-output	[6:0]	oData7Seg0,		// 7seg display data
-				oData7Seg1;
-output			oData7SegP;		// 7seg 0's dp
-output	[7:0]	oDataLED;		// 8bit LED data
+module CDEC(
+	
+	input			Clk,			// clock
+	input			Reset,			// reset
+	input			iClkMst,		// master input clk ( 24MHz )
+	
+	output			oClkDiv,		// output divided clk
+	
+	output	[6:0]	oData7Seg0,		// 7seg display data
+					oData7Seg1,
+	output			oData7SegP,		// 7seg 0's dp
+	output	[7:0]	oDataLED		// 8bit LED data
+);
 
 // wire / reg
 
@@ -683,10 +684,10 @@ endmodule
 
 /*** 7seg decoder ***********************************************************/
 
-module Seg7Decode;
-
-input	[3:0]	iData;
-outreg	[6:0]	oSegData;
+module Seg7Decode(
+	input	[3:0]	iData,
+	outreg	[6:0]	oSegData
+);
 
 	always@( iData ) begin
 		Case( iData )		 // GFEDCBA
@@ -713,11 +714,11 @@ endmodule
 
 /*** clock division circuit *************************************************/
 
-module ClkDiv;
-
-input			iClkMst;	// master input clk ( 24MHz )
-input			Reset;		// reset
-outreg			oClkDiv;	// divided clk out ( 1/6 = 4MHz )
+module ClkDiv(
+	input			iClkMst,	// master input clk ( 24MHz )
+	input			Reset,		// reset
+	outreg			oClkDiv	// divided clk out ( 1/6 = 4MHz )
+);
 
 // wire / reg
 

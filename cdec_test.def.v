@@ -6,11 +6,11 @@ $header
 		Copylight(C) 2001 by Deyu Deyu Software
 
 *****************************************************************************/
+$wire	[io]?(.+)	$1
 
 `timescale 1ns/1ns
 
 #include "cdec.def.v"
-#include "RAM.v"
 
 testmodule CDEC_TEST;
 
@@ -40,29 +40,29 @@ parameter		STEP = 24;
 	/*** monitoring *********************************************************/
 	
 	initial begin
-		fd		= $fopen( "CDEC_exec.log" );
+		fd		= $fopen( "cdec_exec.log" );
 		prePC	= 8'hFF;
 	end
 	
 	always@( posedge Clk ) begin
-		if( CDECInst.SequencerInst.StateReg == 1 ) begin
+		if( CDEC.Sequencer.StateReg == 1 ) begin
 			
-			if( prePC == CDECInst.RegPC ) begin
+			if( prePC == CDEC.RegPC ) begin
 				CoreDump;
 				$fclose( fd );
 				$finish;
 			end
 			
-			prePC = CDECInst.RegPC;
+			prePC = CDEC.RegPC;
 			
 			$fdisplay( fd, "A:%h B:%h C:%h PC:%h %s%s%s",
-				CDECInst.RegA,
-				CDECInst.RegB,
-				CDECInst.RegC,
-				CDECInst.RegPC,
-				( CDECInst.FlagsReg[ 2 ] ? "-" : "+" ),
-				( CDECInst.FlagsReg[ 1 ] ? "Z" : "." ),
-				( CDECInst.FlagsReg[ 0 ] ? "C" : "." )
+				CDEC.RegA,
+				CDEC.RegB,
+				CDEC.RegC,
+				CDEC.RegPC,
+				( CDEC.FlagsReg[ 2 ] ? "-" : "+" ),
+				( CDEC.FlagsReg[ 1 ] ? "Z" : "." ),
+				( CDEC.FlagsReg[ 0 ] ? "C" : "." )
 			);
 		end
 	end
@@ -79,9 +79,9 @@ integer	i;
 			if( i % 16 == 0 ) $fwrite( fd, "%h:", i[7:0] );
 			
 			if( i % 16 == 15 )
-				$fdisplay( fd, " %h", CDECInst.RAMInst.lpm_ram_dq_component.RAM[ i ] );
+				$fdisplay( fd, " %h", CDEC.RAM.lpm_ram_dq_component.RAM[ i ] );
 			else
-				$fwrite  ( fd, " %h", CDECInst.RAMInst.lpm_ram_dq_component.RAM[ i ] );
+				$fwrite  ( fd, " %h", CDEC.RAM.lpm_ram_dq_component.RAM[ i ] );
 		end
 	end
 endtask
@@ -90,14 +90,14 @@ endmodule
 
 /*** altera RAM module for simulation ***************************************/
 
-module lpm_ram_dq;
-
-// I/O port
-
-input	[7:0]	address;
-input			we;
-input	[7:0]	data;
-output	[7:0]	q;
+module lpm_ram_dq(
+	// I/O port
+	
+	input	[7:0]	address,
+	input			we,
+	input	[7:0]	data,
+	output	[7:0]	q
+);
 
 // reg / wire
 
